@@ -94,6 +94,16 @@
                                     saw: results[pluginName].result.slice(i, i + 1),
                                     index: i
                                 }
+                                var actualReversed = actual.split('').reverse();
+                                    resultReveresed = results[pluginName].result.split('').reverse();
+                                for(var j = 0; j < actual.length; j++){
+                                    if(actualReversed[j] !== resultReveresed[j]){
+                                        if(results[pluginName].trace.actualEndIndex === undefined){
+                                            results[pluginName].trace.endIndex = j;
+                                            break;
+                                        }
+                                    }
+                                }
                                 break;
                             }
                         }
@@ -127,18 +137,20 @@
                                 $.el.pre(
                                     results[pluginName].result.slice(0, results[pluginName].trace.index),
                                     $.el.span({"class":"failed"},
-                                        results[pluginName].result.slice(results[pluginName].trace.index, results[pluginName].trace.index + 1)
+                                        (function(){
+                                            return results[pluginName].result.slice(results[pluginName].trace.index, -results[pluginName].trace.endIndex)
+                                        })()
                                     ),
-                                    results[pluginName].result.slice(results[pluginName].trace.index + 1)
+                                    results[pluginName].result.slice(-results[pluginName].trace.endIndex)
                                 )
                             ),                            
                             $.el.code(
                                 $.el.pre(
                                     actual.slice(0, results[pluginName].trace.index),
                                     $.el.span({"class":"failed"},
-                                        actual.slice(results[pluginName].trace.index, results[pluginName].trace.index + 1)
+                                        actual.slice(results[pluginName].trace.index, -results[pluginName].trace.endIndex)
                                     ),
-                                    actual.slice(results[pluginName].trace.index + 1)
+                                    actual.slice(-results[pluginName].trace.endIndex)
                                 )
                             )
                         )
@@ -167,7 +179,8 @@
             <hr>
             <p style="color:red; font-weight:bold;">A paragraph</p>
             <p>This page runs each plugin in dom.to.js, on the body tag of this page, then evals the result, and checks that the output is exactly the same as the body tag itsself.</p>
-            <p onclick="alert();">To test for equality, the plugins must be run with the 'withWhitespace' setting set to true, so that the output is not changed.</p>
+            <p>To test for equality, the plugins must be run with the 'withWhitespace' setting set to true, so that the output is not changed.</p>
+            <p onclick="fuckYouImLaconic">Laconic converts onclick attributes to onclick properties, and adds a href to the element instead, even if its an element that href shouldn't be on. I personally think thats a terrible idea, since the code outputs something completely unexpected.</p>
             
         </div>
     </body>
