@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script src="https://raw.github.com/joestelmach/laconic/master/laconic.js"></script>
+        <script src="dom.to.js"></script>
+        <script src="toLaconic.js"></script>
+        <style>
+            body{
+                font-family:arial;
+                background-color:#eee;
+                margin:0;
+                padding:5%;
+            }
+            .passed{
+                color:green;
+            }
+            .failed{
+                color:red;
+            }
+            .failed code{
+                color:black;
+            }
+            .result{
+                margin:0 -5%;
+                border-top:solid 5px gray;
+                padding:10px 5%;
+                overflow:hidden;
+                height:50px;
+                -webkit-transition: 0.2s height ease-out;
+                transition: 0.2s height ease-out;
+            }
+            .result:hover{
+                height:380px;
+                background-color:white;
+            }
+            .result.failed{
+                height:auto;                
+            }
+            .codeWrapper{
+                display:inline-block;
+                width:10%;
+                opacity:0.2;
+                max-height:300px;
+                overflow:scroll;
+            }
+            .codeWrapper + .codeWrapper{
+                width:90%;
+                opacity:1;
+            }
+            .codeWrapper:focus{
+                width:90%;
+                opacity:1;
+            }
+            .codeWrapper:focus + .codeWrapper{
+                width:10%;
+                opacity:0.2;
+            }
+            .codeWrapper h4{
+                margin:10px;
+            }
+            .trace .failed{
+                font-weight:bold;
+                font-size:50px;
+            }
+        </style>
+        <script>
+            window.onload = function(){
+                var results = {},
+                    body = document.getElementsByTagName('body')[0],
+                    actual = body.outerHTML,
+                    totalTests = 0,
+                    numPassed = 0;
+                                    
+                for(var pluginName in domToJs.plugins){
+                    totalTests++;
+                    results[pluginName] = {};
+                    results[pluginName].output = domToJs(body, pluginName, {keepWhitespace: true}); // needed to compare exactness between dom and output.
+                    results[pluginName].niceOutput = domToJs(body, pluginName);
+                    results[pluginName].result = eval(results[pluginName].output).outerHTML;
+                }
+                
+                body.appendChild($.el.header({'class':'testSummary'}));
+                
+                for(var pluginName in results){
+                    var result = results[pluginName].result === actual;
+                    result && numPassed++;
+                    
+                    if(!result){
+                        for(var i = 0; i < actual.length; i++){
+                            if(actual.charAt(i) !== results[pluginName].result.charAt(i)){
+                                results[pluginName].trace = {
+                                    expected: actual.slice(i, i + 1),
+                                    saw: results[pluginName].result.slice(i, i + 1),
+                                    index: i
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    
+                    var resultElement = $.el.div({"class":"result " + (result ? 'passed' : 'failed')},
+                        $.el.h3({"class":(result ? 'passed' : 'failed')},
+                            pluginName + " " + (result ? 'passed' : 'failed'),
+                            !result && " at character " + results[pluginName].trace.index + " -> Expected: '" + results[pluginName].trace.expected + "' instead saw: '" + results[pluginName].trace.saw + "'"
+                        ),
+                        $.el.strong(
+                            "output"
+                        ),
+                        ":",
+                        $.el.div(
+                            $.el.div({"class":"codeWrapper", "tabindex":0},
+                                $.el.h4("With Whitespace"),
+                                $.el.code({"class":"withWhitespace"},
+                                    $.el.pre(results[pluginName].output)
+                                )
+                            ),
+                            $.el.div({"class":"codeWrapper", "tabindex":0},
+                                $.el.h4("Without Whitespace"),
+                                $.el.code({"class":"withoutWhitespace"},
+                                    $.el.pre(results[pluginName].niceOutput)
+                                )
+                            )
+                        ),
+                        !result && $.el.div({"class":"trace"},
+                            $.el.code(
+                                $.el.pre(
+                                    results[pluginName].result.slice(0, results[pluginName].trace.index),
+                                    $.el.span({"class":"failed"},
+                                        results[pluginName].result.slice(results[pluginName].trace.index, results[pluginName].trace.index + 1)
+                                    ),
+                                    results[pluginName].result.slice(results[pluginName].trace.index + 1)
+                                )
+                            ),                            
+                            $.el.code(
+                                $.el.pre(
+                                    actual.slice(0, results[pluginName].trace.index),
+                                    $.el.span({"class":"failed"},
+                                        actual.slice(results[pluginName].trace.index, results[pluginName].trace.index + 1)
+                                    ),
+                                    actual.slice(results[pluginName].trace.index + 1)
+                                )
+                            )
+                        )
+                    );
+                    
+                    body.appendChild(resultElement);
+                    
+                    !result && $(resultElement)
+                }
+                
+                var totals = $.el.h1({"class":(totalTests === numPassed ? 'passed' : 'failed')},
+                    numPassed,
+                    ' out of ',
+                    totalTests,
+                    ' plugins passed'
+                );
+                
+                $('.testSummary').append(totals);
+            }
+        </script>
+    </head>
+    <body>
+        <h1>A Test Page</h1>
+        <div class="aClass">
+            <h2 id="anId">Some content</h2>
+            <hr>
+            <p style="color:red; font-weight:bold;">A paragraph</p>
+            <p>This page runs each plugin in dom.to.js, on the body tag of this page, then evals the result, and checks that the output is exactly the same as the body tag itsself.</p>
+            <p onclick="alert();">To test for equality, the plugins must be run with the 'withWhitespace' setting set to true, so that the output is not changed.</p>
+            
+        </div>
+    </body>
+</html>
