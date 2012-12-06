@@ -18,7 +18,11 @@ The library supports pluginability of other dom creation librarys, as exists in 
 
 Also, if jQuery is available, dom.to.js attaches itself as a plugin.
 
-# usage #
+# Handy Bookmarklet! #
+
+    JavaScript: var script = document.createElement('script'); script.setAttribute('src', 'https://raw.github.com/KoryNunn/dom-to-js/master/dom.to.js'); document.getElementsByTagName('head')[0].appendChild(script);
+
+# Usage #
 
 Usage in vanila JS:
 
@@ -28,7 +32,7 @@ Usage in jQuery:
 
     $element.toJs();
     
-To use a plugin:
+To use a plugin, eg. laconic:
 
     domToJs(element, 'laconic');
     
