@@ -32,6 +32,12 @@ To use a plugin:
 
     domToJs(element, 'laconic');
     
+# Plugins? #
+
+Yep.
+
+Use toLaconic.js as an example.
+    
 # Settings #
 
 There is really only one setting at the moment, and that is the ability to force dom.to.js to maintain whitespace.
@@ -46,3 +52,13 @@ The page will run any plugin you add to it if you want to test your own.
 # Future #
 
 Nothin much, maybe add some other dom creation libraries?
+
+# Browser Support #
+
+What's supported:
+
+All browsers, Chrome, firefox.
+
+What's not:
+
+Things that are not browsers, like a cake, and Internet Exploder. Even IE10 doesn't work. Why? Who cares, this is a development tool.
