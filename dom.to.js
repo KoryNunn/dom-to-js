@@ -28,7 +28,7 @@
             if(settings.keepWhitespace){
                 text = element.nodeValue.replace(/\n/g, '\\n');
             }else{
-                text = element.nodeValue.replace(/^\s+|\s+$/g, '');
+                text = element.nodeValue.replace(/^\s+|\s+$/g, '').replace(/\n/g, '\\n');
             }
             if(text !== ""){
                 return plugin.createText(text, indent);
